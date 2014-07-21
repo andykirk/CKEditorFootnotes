@@ -29,7 +29,7 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
 						type: 'textarea',
 						id: 'new_footnote',
                         'class': 'footnote_text',
-						label: 'New Footnote',
+						label: 'New footnote:',
                         inputStyle: 'height: 100px',
 					},
 					{
@@ -54,7 +54,7 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
 
                             if ($footnotes.length > 0) {
                                 if ($el.find('p').length == 0) {
-                                    $el.append('<p><strong>OR:</strong> Choose footnote:</p><ol></ol>');
+                                    $el.append('<p style="margin-bottom: 10px;"><strong>OR:</strong> Choose footnote:</p><ol></ol>');
                                 } else {
                                     $el.find('ol').empty();
                                 }
@@ -63,7 +63,7 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
                                 $footnotes.find('li').each(function(){
                                     $item = jQuery(this);
                                     var footnote_id = $item.attr('data-footnote-id');
-                                    radios += '<li><input type="radio" name="footnote_id" value="' + footnote_id + '" id="fn_' + footnote_id + '" /> <label for="fn_' + footnote_id + '">' + $item.find('cite').html() + '</label></li>';
+                                    radios += '<li><input type="radio" name="footnote_id" value="' + footnote_id + '" id="fn_' + footnote_id + '" /> <label for="fn_' + footnote_id + '" style="white-space: normal; display: inline-block; padding: 0 25px 0 5px; vertical-align: top; margin-bottom: 10px;">' + $item.find('cite').text() + '</label></li>';
                                 });
                                 
                                 $el.children('label,div').css('display', 'none');
