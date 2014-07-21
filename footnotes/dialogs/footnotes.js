@@ -28,7 +28,7 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
 						// Text input field for the footnotes text.
 						type: 'textarea',
 						id: 'new_footnote',
-                        class: 'footnote_text',
+                        'class': 'footnote_text',
 						label: 'New Footnote',
                         inputStyle: 'height: 100px',
 					},
@@ -50,7 +50,7 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
                             editor = dialog.getParentEditor();
                             // Dynamically add existing footnotes:
                             $footnotes = jQuery('#' + editor.id + '_contents iframe').contents().find('#footnotes ol');
-                            $this = this;
+                            $this = this;                            
 
                             if ($footnotes.length > 0) {
                                 if ($el.find('p').length == 0) {
@@ -65,10 +65,10 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
                                     var footnote_id = $item.attr('data-footnote-id');
                                     radios += '<li><input type="radio" name="footnote_id" value="' + footnote_id + '" id="fn_' + footnote_id + '" /> <label for="fn_' + footnote_id + '">' + $item.find('cite').html() + '</label></li>';
                                 });
-
+                                
                                 $el.children('label,div').css('display', 'none');
                                 $el.find('ol').html(radios);
-                                $el.find(':radio').change(function(){
+                                $el.find(':radio').change(function(){;
                                     $el.find(':text').val(jQuery(this).val());
                                 });
                                 
@@ -92,6 +92,7 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
 
             
             CKEDITOR.replaceAll( function( textarea, config ) {
+                console.log(textarea);
                 if (!textarea.className.match(/footnote_text/)) {
                     return false;
                 }
@@ -100,14 +101,12 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
                     { name: 'editing',     groups: [ 'undo', 'find', 'selection', 'spellchecker' ] },
                     { name: 'clipboard',   groups: [ 'clipboard' ] },
                     { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
-                    { name: 'links' }
                 ]
                 config.allowedContent = 'b i; a[!href]';
                 config.autoParagraph = false;
                 config.height = 80;
                 config.resize_enabled = false;
                 config.autoGrow_minHeight = 80;
-                config.extraPlugins = '';
                 
                 config.on = {
                     focus: function( evt ){
