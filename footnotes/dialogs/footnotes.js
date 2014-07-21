@@ -11,7 +11,7 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
         editor_name: false,
 		// Basic properties of the dialog window: title, minimum size.
 		title: 'Manage Footnotes',
-		minWidth: 400,
+        minWidth: 500,
 		minHeight: 200,
         footnotes_el: false,
 
@@ -63,7 +63,7 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
                                 $footnotes.find('li').each(function(){
                                     $item = jQuery(this);
                                     var footnote_id = $item.attr('data-footnote-id');
-                                    radios += '<li><input type="radio" name="footnote_id" value="' + footnote_id + '" id="fn_' + footnote_id + '" /> <label for="fn_' + footnote_id + '" style="white-space: normal; display: inline-block; padding: 0 25px 0 5px; vertical-align: top; margin-bottom: 10px;">' + $item.find('cite').text() + '</label></li>';
+                                    radios += '<li style="margin-left: 15px;"><input type="radio" name="footnote_id" value="' + footnote_id + '" id="fn_' + footnote_id + '" /> <label for="fn_' + footnote_id + '" style="white-space: normal; display: inline-block; padding: 0 25px 0 5px; vertical-align: top; margin-bottom: 10px;">' + $item.find('cite').text() + '</label></li>';
                                 });
                                 
                                 $el.children('label,div').css('display', 'none');
