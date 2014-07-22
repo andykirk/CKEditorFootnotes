@@ -17,7 +17,6 @@ CKEDITOR.plugins.add( 'footnotes', {
 	// The plugin initialization logic goes inside this method.
 	init: function(editor) {
         this.editor = editor;
-        console.log(editor.id);
         
         // Allow `cite` to be editable:
         CKEDITOR.dtd.$editable['cite'] = 1;
@@ -29,7 +28,6 @@ CKEDITOR.plugins.add( 'footnotes', {
         // Add the reorder change event:
         var $this = this;
         editor.on('change', function(evt)  {
-            
             // Don't reorder the markers if editing a cite:
             var footnote_section = evt.editor.getSelection().getStartElement().getAscendant('section');
             if (footnote_section && footnote_section.$.id == 'footnotes') {
@@ -46,16 +44,16 @@ CKEDITOR.plugins.add( 'footnotes', {
         // Build the initial footnotes widget editables definition:
         var def = {
             header: {
-                selector: 'header',
+                selector: 'header > *',
                 //allowedContent: ''
-                allowedContent: 'h2 h3 h4 h5 h6 i b em strong span sub sup '
+                allowedContent: 'i b span sub sup;'
             }
         };
         var contents = jQuery('<div>' + editor.element.$.textContent + '</div>')
                  , l = contents.find('#footnotes li').length
                  , i = 1;
         for (i; i <= l; i++) {
-            def['footnote_' + i] = {selector: '#footnote-' + i +' cite', allowedContent: 'a[href]; cite[*](*); b i em strong span'};
+            def['footnote_' + i] = {selector: '#footnote-' + i +' cite', allowedContent: 'a[href]; cite[*](*); b i span'};
         }
     
         // Register the footnotes widget.
@@ -109,9 +107,8 @@ CKEDITOR.plugins.add( 'footnotes', {
 	},
     
 
-    build: function(editor, footnote, is_new) {
-        editor.fire('lockSnapshot');
-        
+    build: function(footnote, is_new) {
+        this.editor.fire('lockSnapshot');
         if (is_new) {
             // Generate new id:
             footnote_id = this.generateFootnoteId();
@@ -123,11 +120,11 @@ CKEDITOR.plugins.add( 'footnotes', {
         // Insert the marker:
         var footnote_marker = '<sup data-footnote-id="' + footnote_id + '">X</sup>';
 
-        editor.fire('unlockSnapshot');
-        editor.insertHtml(footnote_marker);
+        this.editor.fire('unlockSnapshot');
+        this.editor.insertHtml(footnote_marker);
         
         if (is_new) {
-            this.addFootnote(editor, this.buildFootnote(footnote_id, footnote));
+            this.addFootnote(this.buildFootnote(footnote_id, footnote));
         }
 
         this.reorderMarkers();
@@ -158,18 +155,18 @@ CKEDITOR.plugins.add( 'footnotes', {
         return footnote;
     },
     
-    addFootnote: function(editor, footnote) {
-        $contents  = jQuery('#' + editor.id + '_contents iframe').contents().find('body');
+    addFootnote: function(footnote) {
+        $contents  = jQuery('#' + this.editor.id + '_contents iframe').contents().find('body');
         $footnotes = $contents.find('#footnotes');
         
         if ($footnotes.length == 0) {
             var container = '<section id="footnotes" class="footnotes"><header><h2>Footnotes</h2></header><ol>' + footnote + '</ol></section>';
             // Move cursor to end of content:
-            var range = editor.createRange();
+            var range = this.editor.createRange();
             range.moveToElementEditEnd(range.root);
-            editor.getSelection().selectRanges([range]);
+            this.editor.getSelection().selectRanges([range]);
             // Insert the container:
-            editor.insertHtml(container);
+            this.editor.insertHtml(container);
         } else {
             $footnotes.find('ol').append(footnote);
         }
@@ -194,12 +191,6 @@ CKEDITOR.plugins.add( 'footnotes', {
             occurrences: {}
         };
         
-        // Check that there's a footnotes section. If it's been deleted the markers are useless:
-        if ($contents.find('#footnotes').length == 0) {
-            $contents.find('sup[data-footnote-id]').remove();
-            return;
-        }
-        
         // Find all the markers in the document:
         var $markers = $contents.find('sup[data-footnote-id]');
         // If there aren't any, remove the Footnotes container:
@@ -213,14 +204,7 @@ CKEDITOR.plugins.add( 'footnotes', {
             var footnote_id = jQuery(this).attr('data-footnote-id')
               , marker_ref
               , n = data.order.indexOf(footnote_id);
-            // If there isn't a matching footnote, remove the marker:
-            //console.log($contents.find('#footnote-' + (n + 1)).length);
-            //console.log('#footnote-' + (n + 1));
-            /*if ($contents.find('#footnote-' + (n + 1)).length == 0) {
-                //jQuery(this).remove();
-                return;
-            }*/
-              
+            
             // If this is the markers first occurrence:
             if (n == -1) {
                 // Store the id:
@@ -252,7 +236,8 @@ CKEDITOR.plugins.add( 'footnotes', {
         
         // Next we need to reinstate the 'editable' properties of the footnotes.
         // (we have to do this individually due to Widgets 'fireOnce' for editable selectors)
-        var footnote_widget;
+        var el = $contents.find('#footnotes')
+          , footnote_widget;
         // So first we need to find the right Widget instance:
         // (I hope there's a better way of doing this but I can't find one)
         for (i in this.editor.widgets.instances) {

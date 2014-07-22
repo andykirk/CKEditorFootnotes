@@ -11,7 +11,7 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
         editor_name: false,
 		// Basic properties of the dialog window: title, minimum size.
 		title: 'Manage Footnotes',
-        minWidth: 500,
+		minWidth: 400,
 		minHeight: 200,
         footnotes_el: false,
 
@@ -92,7 +92,6 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
 
             
             CKEDITOR.replaceAll( function( textarea, config ) {
-                console.log(textarea);
                 if (!textarea.className.match(/footnote_text/)) {
                     return false;
                 }
@@ -107,6 +106,7 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
                 config.height = 80;
                 config.resize_enabled = false;
                 config.autoGrow_minHeight = 80;
+                config.removePlugins = 'footnotes';
                 
                 config.on = {
                     focus: function( evt ){
@@ -137,11 +137,11 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
                     return;
                 } else {
                     // Insert new footnote:
-                    editor.plugins.footnotes.build(editor, new_footnote, true);
+                    editor.plugins.footnotes.build(new_footnote, true);
                 }
             } else {
                 // Insert existing footnote:
-                editor.plugins.footnotes.build(editor, footnote_id, false);
+                editor.plugins.footnotes.build(footnote_id, false);
             }
             // Destroy the editor so it's rebuilt properly next time:
             footnote_editor.destroy();
