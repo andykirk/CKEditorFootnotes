@@ -102,12 +102,13 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
                     { name: 'clipboard',   groups: [ 'clipboard' ] },
                     { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
                 ]
-                config.allowedContent = 'b i; a[!href]';
+                config.allowedContent = 'br b i; a[!href]';
+                config.enterMode = CKEDITOR.ENTER_BR;
                 config.autoParagraph = false;
                 config.height = 80;
                 config.resize_enabled = false;
                 config.autoGrow_minHeight = 80;
-                config.removePlugins = 'footnotes';
+                config.removePlugins = 'footnotes';//,elementspath';
 
                 config.on = {
                     focus: function( evt ){

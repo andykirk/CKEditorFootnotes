@@ -25,6 +25,10 @@ CKEDITOR.plugins.add( 'footnotes', {
         // Add the reorder change event:
         var $this = this;
         editor.on('change', function(evt)  {
+            // Prevent no selection errors:
+            if (!evt.editor.getSelection().getStartElement()) {
+                return;
+            }
             // Don't reorder the markers if editing a cite:
             var footnote_section = evt.editor.getSelection().getStartElement().getAscendant('section');
             if (footnote_section && footnote_section.$.id == 'footnotes') {
@@ -50,7 +54,7 @@ CKEDITOR.plugins.add( 'footnotes', {
                  , l = contents.find('#footnotes li').length
                  , i = 1;
         for (i; i <= l; i++) {
-            def['footnote_' + i] = {selector: '#footnote-' + i +' cite', allowedContent: 'a[href]; cite[*](*); b i span'};
+            def['footnote_' + i] = {selector: '#footnote-' + i +' cite', allowedContent: 'a[href]; cite[*](*); b i span br'};
         }
 
         // Register the footnotes widget.
