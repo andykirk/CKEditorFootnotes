@@ -35,6 +35,7 @@ CKEDITOR.plugins.add( 'footnotes', {
             if(!evt.editor.footnotes_tmp) {
                 evt.editor.footnotes_tmp = evt.editor.footnotes_store;
             }
+
             // Prevent no selection errors:
             if (!evt.editor.getSelection().getStartElement()) {
                 return;
@@ -53,6 +54,7 @@ CKEDITOR.plugins.add( 'footnotes', {
         });
 
         // Build the initial footnotes widget editables definition:
+        var prefix = editor.config.footnotesPrefix ? '-' + editor.config.footnotesPrefix : '';
         var def = {
             header: {
                 selector: 'header > *',
@@ -64,7 +66,7 @@ CKEDITOR.plugins.add( 'footnotes', {
                  , l = contents.find('.footnotes li').length
                  , i = 1;
         for (i; i <= l; i++) {
-            def['footnote_' + i] = {selector: '#footnote-' + i +' cite', allowedContent: 'a[href]; cite[*](*); strong em span br'};
+            def['footnote_' + i] = {selector: '#footnote' + prefix + '-' + i + ' cite', allowedContent: 'a[href]; cite[*](*); strong em span br'};
         }
 
         // Register the footnotes widget.
@@ -251,7 +253,7 @@ CKEDITOR.plugins.add( 'footnotes', {
         for (i in data.order) {
             footnote_id   = data.order[i];
             footnote_text = $contents.find('.footnotes [data-footnote-id=' + footnote_id + '] cite').html();
-            // If the footnotes text can't be found in the editor, it may be in the tmp  store 
+            // If the footnotes text can't be found in the editor, it may be in the tmp store 
             // following a cut:
             if (!footnote_text) {
                 footnote_text = editor.footnotes_tmp[footnote_id];
@@ -259,8 +261,7 @@ CKEDITOR.plugins.add( 'footnotes', {
             footnotes += this.buildFootnote(footnote_id, footnote_text, data, editor);
             // Store the footnotes for later use (post cut/paste):
             editor.footnotes_store[footnote_id] = footnote_text;
-        }
-        
+        }       
         
         // Insert the footnotes into the list:
         $contents.find('.footnotes ol').html(footnotes);
@@ -280,7 +281,7 @@ CKEDITOR.plugins.add( 'footnotes', {
         // Then we `initEditable` each footnote, giving it a unique selector:
         for (i in data.order) {
             n = parseInt(i) + 1;
-            footnote_widget.initEditable('footnote_' + n, {selector: '#footnote-' + n +' cite', allowedContent: 'a[href]; cite[*](*); b i span'});
+            footnote_widget.initEditable('footnote_' + n, {selector: '#footnote' + prefix + '-' + n +' cite', allowedContent: 'a[href]; cite[*](*); em strong span'});
         }
 
         editor.fire('unlockSnapshot');
