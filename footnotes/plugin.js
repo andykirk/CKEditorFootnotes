@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Basic sample plugin inserting footnotes elements into CKEditor editing area.
  *
  * Created out of the CKEditor Plugin SDK:
@@ -7,58 +7,69 @@
 
 // Register the plugin within the editor.
 CKEDITOR.plugins.add( 'footnotes', {
-	
-    editor: false,  
-    footnote_ids: [],    
+
+    footnote_ids: [],
     requires: 'widget',
 	icons: 'footnotes',
-    
+
 
 	// The plugin initialization logic goes inside this method.
 	init: function(editor) {
-        this.editor = editor;
-        
         // Allow `cite` to be editable:
         CKEDITOR.dtd.$editable['cite'] = 1;
-        
+
         // Add some CSS tweaks:
         var css = '.footnotes{background:#eee; padding:1px 15px;} .footnotes cite{font-style: normal;}';
         CKEDITOR.addCss(css);
         
-        // Add the reorder change event:
         var $this = this;
-        editor.on('change', function(evt)  {
+        
+        // Force a reorder on startup to make sure all vars are set: (e.g. footnotes store)
+        editor.on('instanceReady', function(evt) {
+            $this.reorderMarkers(editor);
+        });
+
+        // Add the reorder change event:
+        editor.on('change', function(evt) {
+            // Copy the footnotes_store as we may be doing a cut:
+            if(!evt.editor.footnotes_tmp) {
+                evt.editor.footnotes_tmp = evt.editor.footnotes_store;
+            }
+            // Prevent no selection errors:
+            if (!evt.editor.getSelection().getStartElement()) {
+                return;
+            }
             // Don't reorder the markers if editing a cite:
             var footnote_section = evt.editor.getSelection().getStartElement().getAscendant('section');
-            if (footnote_section && footnote_section.$.id == 'footnotes') {
+            if (footnote_section && footnote_section.$.className.indexOf('footnotes') != -1) {
                 return;
             }
             // SetTimeout seems to be necessary (it's used in the core but can't be 100% sure why)
             setTimeout(function(){
-                    $this.reorderMarkers();
+                    $this.reorderMarkers(editor);
                 },
                 0
             );
         });
-        
+
         // Build the initial footnotes widget editables definition:
         var def = {
             header: {
                 selector: 'header > *',
                 //allowedContent: ''
-                allowedContent: 'i b span sub sup;'
+                allowedContent: 'strong em span sub sup;'
             }
         };
         var contents = jQuery('<div>' + editor.element.$.textContent + '</div>')
-                 , l = contents.find('#footnotes li').length
+                 , l = contents.find('.footnotes li').length
                  , i = 1;
         for (i; i <= l; i++) {
-            def['footnote_' + i] = {selector: '#footnote-' + i +' cite', allowedContent: 'a[href]; cite[*](*); b i span'};
+            def['footnote_' + i] = {selector: '#footnote-' + i +' cite', allowedContent: 'a[href]; cite[*](*); strong em span br'};
         }
-    
+
         // Register the footnotes widget.
 		editor.widgets.add('footnotes', {
-        
+
 			// Minimum HTML which is required by this widget to work.
 			requiredContent: 'section(footnotes)',
 
@@ -66,10 +77,10 @@ CKEDITOR.plugins.add( 'footnotes', {
 			upcast: function(element) {
 				return element.name == 'section' && element.hasClass('footnotes');
 			},
-            
+
             editables: def
 		});
-		
+
 		// Register the footnotemarker widget.
 		editor.widgets.add('footnotemarker', {
 
@@ -105,10 +116,10 @@ CKEDITOR.plugins.add( 'footnotes', {
 		// Register our dialog file. this.path is the plugin folder path.
 		CKEDITOR.dialog.add('footnotesDialog', this.path + 'dialogs/footnotes.js');
 	},
-    
 
-    build: function(footnote, is_new) {
-        this.editor.fire('lockSnapshot');
+
+    build: function(footnote, is_new, editor) {
+        editor.fire('lockSnapshot');
         if (is_new) {
             // Generate new id:
             footnote_id = this.generateFootnoteId();
@@ -120,30 +131,31 @@ CKEDITOR.plugins.add( 'footnotes', {
         // Insert the marker:
         var footnote_marker = '<sup data-footnote-id="' + footnote_id + '">X</sup>';
 
-        this.editor.fire('unlockSnapshot');
-        this.editor.insertHtml(footnote_marker);
-        
+        editor.fire('unlockSnapshot');
+        editor.insertHtml(footnote_marker);
+
         if (is_new) {
-            this.addFootnote(this.buildFootnote(footnote_id, footnote));
+            this.addFootnote(this.buildFootnote(footnote_id, footnote, false, editor), editor);
         }
 
-        this.reorderMarkers();
+        this.reorderMarkers(editor);
     },
-    
-    buildFootnote: function(footnote_id, footnote_text, data) {
+
+    buildFootnote: function(footnote_id, footnote_text, data, editor) {
         data ? data : false;
         var links   = '';
         var letters = 'abcdefghijklmnopqrstuvwxyz';
         var order   = data ? data.order.indexOf(footnote_id) + 1
                            : 1;
+        var prefix  = editor.config.footnotesPrefix ? '-' + editor.config.footnotesPrefix : '';
         if (data && data.occurrences[footnote_id] == 1) {
-            links = '<a href="#footnote-marker-' + order + '-1">^</a> ';
+            links = '<a href="#footnote-marker' + prefix + '-' + order + '-1">^</a> ';
         } else if (data && data.occurrences[footnote_id] > 1) {
             var i = 0
               , l = data.occurrences[footnote_id]
               , n = l;
             for (i; i < l; i++) {
-                links += '<a href="#footnote-marker-' + order + '-' + (i + 1) + '">' + letters.charAt(i) + '</a>';
+                links += '<a href="#footnote-marker' + prefix + '-' + order + '-' + (i + 1) + '">' + letters.charAt(i) + '</a>';
                 if (i < l-1) {
                     links += ', ';
                 } else {
@@ -151,28 +163,28 @@ CKEDITOR.plugins.add( 'footnotes', {
                 }
             }
         }
-        footnote = '<li id="footnote-' + order + '" data-footnote-id="' + footnote_id + '">' + links + '<cite>' + footnote_text + '</cite></li>';
+        footnote = '<li id="footnote' + prefix + '-' + order + '" data-footnote-id="' + footnote_id + '">' + links + '<cite>' + footnote_text + '</cite></li>';
         return footnote;
     },
-    
-    addFootnote: function(footnote) {
-        $contents  = jQuery('#' + this.editor.id + '_contents iframe').contents().find('body');
-        $footnotes = $contents.find('#footnotes');
-        
+
+    addFootnote: function(footnote, editor) {
+        $contents  = jQuery('#' + editor.id + '_contents iframe').contents().find('body');
+        $footnotes = $contents.find('.footnotes');
+
         if ($footnotes.length == 0) {
-            var container = '<section id="footnotes" class="footnotes"><header><h2>Footnotes</h2></header><ol>' + footnote + '</ol></section>';
+            var container = '<section class="footnotes"><header><h2>Footnotes</h2></header><ol>' + footnote + '</ol></section>';
             // Move cursor to end of content:
-            var range = this.editor.createRange();
+            var range = editor.createRange();
             range.moveToElementEditEnd(range.root);
-            this.editor.getSelection().selectRanges([range]);
+            editor.getSelection().selectRanges([range]);
             // Insert the container:
-            this.editor.insertHtml(container);
+            editor.insertHtml(container);
         } else {
             $footnotes.find('ol').append(footnote);
         }
         return;
     },
-    
+
     generateFootnoteId: function() {
         var id = Math.random().toString(36).substr(2, 5);
         while (jQuery.inArray(id, this.footnote_ids) != -1) {
@@ -181,30 +193,36 @@ CKEDITOR.plugins.add( 'footnotes', {
         this.footnote_ids.push(id);
         return id;
     },
-    
-    reorderMarkers: function() {
-        this.editor.fire('lockSnapshot');
-        editor    = this.editor;
+
+    reorderMarkers: function(editor) {
+        editor.fire('lockSnapshot');
+        var prefix  = editor.config.footnotesPrefix ? '-' + editor.config.footnotesPrefix : '';
         $contents = jQuery('#' + editor.id + '_contents iframe').contents().find('body');
         var data = {
             order: [],
             occurrences: {}
         };
         
+        // Check that there's a footnotes section. If it's been deleted the markers are useless:
+        if ($contents.find('.footnotes').length == 0) {
+            $contents.find('sup[data-footnote-id]').remove();
+            return;
+        }
+
         // Find all the markers in the document:
         var $markers = $contents.find('sup[data-footnote-id]');
         // If there aren't any, remove the Footnotes container:
         if ($markers.length == 0) {
-            $contents.find('#footnotes').remove();
+            $contents.find('.footnotes').remove();
             return;
         }
-        
+
         // Otherwise reorder the markers:
         $markers.each(function(){
             var footnote_id = jQuery(this).attr('data-footnote-id')
               , marker_ref
               , n = data.order.indexOf(footnote_id);
-            
+
             // If this is the markers first occurrence:
             if (n == -1) {
                 // Store the id:
@@ -220,29 +238,42 @@ CKEDITOR.plugins.add( 'footnotes', {
                 marker_ref = n + '-' + data.occurrences[footnote_id];
             }
             // Replace the marker contents:
-            var marker = '<a href="#footnote-' + n + '" id="footnote-marker-' + marker_ref + '" rel="footnote">[' + n + ']</a>';
+            var marker = '<a href="#footnote' + prefix + '-' + n + '" id="footnote-marker' + prefix + '-' + marker_ref + '" rel="footnote">[' + n + ']</a>';
             jQuery(this).html(marker);
         });
-        
+
+        // Prepare the footnotes_store object:
+        editor.footnotes_store = {};
+
         // Then rebuild the Footnotes content to match marker order:
         var footnotes     = '';
         var footnote_text = '';
         for (i in data.order) {
             footnote_id   = data.order[i];
-            footnote_text = $contents.find('#footnotes [data-footnote-id=' + footnote_id + '] cite').html();
-            footnotes    += this.buildFootnote(footnote_id, footnote_text, data);
+            footnote_text = $contents.find('.footnotes [data-footnote-id=' + footnote_id + '] cite').html();
+            // If the footnotes text can't be found in the editor, it may be in the tmp  store 
+            // following a cut:
+            if (!footnote_text) {
+                footnote_text = editor.footnotes_tmp[footnote_id];
+            }
+            footnotes += this.buildFootnote(footnote_id, footnote_text, data, editor);
+            // Store the footnotes for later use (post cut/paste):
+            editor.footnotes_store[footnote_id] = footnote_text;
         }
-        $contents.find('#footnotes ol').html(footnotes);
         
+        
+        // Insert the footnotes into the list:
+        $contents.find('.footnotes ol').html(footnotes);
+
         // Next we need to reinstate the 'editable' properties of the footnotes.
         // (we have to do this individually due to Widgets 'fireOnce' for editable selectors)
-        var el = $contents.find('#footnotes')
+        var el = $contents.find('.footnotes')
           , footnote_widget;
         // So first we need to find the right Widget instance:
         // (I hope there's a better way of doing this but I can't find one)
-        for (i in this.editor.widgets.instances) {
-            if (this.editor.widgets.instances[i].name == 'footnotes') {
-                footnote_widget = this.editor.widgets.instances[i];
+        for (i in editor.widgets.instances) {
+            if (editor.widgets.instances[i].name == 'footnotes') {
+                footnote_widget = editor.widgets.instances[i];
                 break;
             }
         }
@@ -252,7 +283,7 @@ CKEDITOR.plugins.add( 'footnotes', {
             footnote_widget.initEditable('footnote_' + n, {selector: '#footnote-' + n +' cite', allowedContent: 'a[href]; cite[*](*); b i span'});
         }
 
-        this.editor.fire('unlockSnapshot');
+        editor.fire('unlockSnapshot');
         return;
     }
 });

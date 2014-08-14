@@ -1,4 +1,4 @@
-/**
+﻿/**
  * The footnotes dialog definition.
  *
  * Created out of the CKEditor Plugin SDK:
@@ -7,6 +7,7 @@
 
 // Dialog definition.
 CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
+
     return {
         editor_name: false,
 		// Basic properties of the dialog window: title, minimum size.
@@ -38,19 +39,19 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
 						id: 'footnote_id',
 						name: 'footnote_id',
 						label: 'No existing footnotes',
-                        
+
 
 						// Called by the main setupContent call on dialog initialization.
 						setup: function( element ) {
                             var dialog = this.getDialog();
                             $el = jQuery('#' + this.domId);
-                            
+
                             dialog.footnotes_el = $el;
-                            
+
                             editor = dialog.getParentEditor();
                             // Dynamically add existing footnotes:
-                            $footnotes = jQuery('#' + editor.id + '_contents iframe').contents().find('#footnotes ol');
-                            $this = this;                            
+                            $footnotes = jQuery('#' + editor.id + '_contents iframe').contents().find('.footnotes ol');
+                            $this = this;
 
                             if ($footnotes.length > 0) {
                                 if ($el.find('p').length == 0) {
@@ -58,20 +59,20 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
                                 } else {
                                     $el.find('ol').empty();
                                 }
-                                
+
                                 var radios = '';
                                 $footnotes.find('li').each(function(){
                                     $item = jQuery(this);
                                     var footnote_id = $item.attr('data-footnote-id');
                                     radios += '<li style="margin-left: 15px;"><input type="radio" name="footnote_id" value="' + footnote_id + '" id="fn_' + footnote_id + '" /> <label for="fn_' + footnote_id + '" style="white-space: normal; display: inline-block; padding: 0 25px 0 5px; vertical-align: top; margin-bottom: 10px;">' + $item.find('cite').text() + '</label></li>';
                                 });
-                                
+
                                 $el.children('label,div').css('display', 'none');
                                 $el.find('ol').html(radios);
                                 $el.find(':radio').change(function(){;
                                     $el.find(':text').val(jQuery(this).val());
                                 });
-                                
+
                             } else {
                                 $el.children('div').css('display', 'none');
                             }
@@ -80,7 +81,7 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
 				]
 			},
 		],
-        
+
 		// Invoked when the dialog is loaded.
 		onShow: function() {
             this.setupContent();
@@ -90,7 +91,7 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
                 dialog.editor_name = evt.editor.name;
             } );
 
-            
+
             CKEDITOR.replaceAll( function( textarea, config ) {
                 if (!textarea.className.match(/footnote_text/)) {
                     return false;
@@ -101,13 +102,14 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
                     { name: 'clipboard',   groups: [ 'clipboard' ] },
                     { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
                 ]
-                config.allowedContent = 'b i; a[!href]';
+                config.allowedContent = 'br b i; a[!href]';
+                config.enterMode = CKEDITOR.ENTER_BR;
                 config.autoParagraph = false;
                 config.height = 80;
                 config.resize_enabled = false;
                 config.autoGrow_minHeight = 80;
-                config.removePlugins = 'footnotes';
-                
+                config.removePlugins = 'footnotes';//,elementspath';
+
                 config.on = {
                     focus: function( evt ){
                         var $editor_el = jQuery('#' + evt.editor.id + '_contents');
@@ -117,18 +119,18 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
                 };
                 return true;
             });
-            
+
 		},
 
 		// This method is invoked once a user clicks the OK button, confirming the dialog.
 		onOk: function() {
             var dialog = this;
-            
+
             var footnote_editor = CKEDITOR.instances[dialog.editor_name];
             var footnote_id     = dialog.getValueOf('tab-basic', 'footnote_id');
-            
+
             editor.fire('saveSnapshot');
-            
+
             if (footnote_id == '') {
                 // No existing id selected, check for new footnote:
                 var new_footnote = footnote_editor.getData();
@@ -137,11 +139,11 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
                     return;
                 } else {
                     // Insert new footnote:
-                    editor.plugins.footnotes.build(new_footnote, true);
+                    editor.plugins.footnotes.build(new_footnote, true, editor);
                 }
             } else {
                 // Insert existing footnote:
-                editor.plugins.footnotes.build(footnote_id, false);
+                editor.plugins.footnotes.build(footnote_id, false, editor);
             }
             // Destroy the editor so it's rebuilt properly next time:
             footnote_editor.destroy();
