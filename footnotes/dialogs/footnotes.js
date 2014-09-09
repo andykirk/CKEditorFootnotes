@@ -108,7 +108,7 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
                 config.height = 80;
                 config.resize_enabled = false;
                 config.autoGrow_minHeight = 80;
-                config.removePlugins = 'footnotes';//,elementspath';
+                config.removePlugins = 'footnotes';
 
                 config.on = {
                     focus: function( evt ){
@@ -127,27 +127,25 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
             var dialog = this;
 
             var footnote_editor = CKEDITOR.instances[dialog.editor_name];
-            var footnote_id     = dialog.getValueOf('tab-basic', 'footnote_id');
+            var footnote_id     = dialog.getValueOf('tab-basic', 'footnote_id');            var footnote_data   = footnote_editor.getData();                        footnote_editor.destroy();
 
             editor.fire('saveSnapshot');
 
             if (footnote_id == '') {
                 // No existing id selected, check for new footnote:
-                var new_footnote = footnote_editor.getData();
-                if (new_footnote == '') {
+                if (footnote_data == '') {
                     // Nothing entered, so quit:
                     return;
                 } else {
                     // Insert new footnote:
-                    editor.plugins.footnotes.build(new_footnote, true, editor);
+                    editor.plugins.footnotes.build(footnote_data, true, editor);
                 }
             } else {
                 // Insert existing footnote:
                 editor.plugins.footnotes.build(footnote_id, false, editor);
             }
             // Destroy the editor so it's rebuilt properly next time:
-            footnote_editor.destroy();
             return;
-		}
+		},                onCancel: function() {            var dialog = this;            var footnote_editor = CKEDITOR.instances[dialog.editor_name];            footnote_editor.destroy();        }
 	};
 });

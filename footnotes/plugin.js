@@ -25,8 +25,7 @@ CKEDITOR.plugins.add( 'footnotes', {
         var $this = this;
         
         // Force a reorder on startup to make sure all vars are set: (e.g. footnotes store)
-        editor.on('instanceReady', function(evt) {
-            $this.reorderMarkers(editor);
+        editor.on('instanceReady', function(evt) {            $this.reorderMarkers(editor);
         });
 
         // Add the reorder change event:
@@ -207,7 +206,7 @@ CKEDITOR.plugins.add( 'footnotes', {
         
         // Check that there's a footnotes section. If it's been deleted the markers are useless:
         if ($contents.find('.footnotes').length == 0) {
-            $contents.find('sup[data-footnote-id]').remove();
+            $contents.find('sup[data-footnote-id]').remove();            editor.fire('unlockSnapshot');
             return;
         }
 
@@ -215,7 +214,7 @@ CKEDITOR.plugins.add( 'footnotes', {
         var $markers = $contents.find('sup[data-footnote-id]');
         // If there aren't any, remove the Footnotes container:
         if ($markers.length == 0) {
-            $contents.find('.footnotes').remove();
+        $contents.find('.footnotes').remove();            editor.fire('unlockSnapshot');
             return;
         }
 
