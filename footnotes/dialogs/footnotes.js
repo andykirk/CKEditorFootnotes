@@ -10,39 +10,39 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
 
     return {
         editor_name: false,
-		// Basic properties of the dialog window: title, minimum size.
-		title: 'Manage Footnotes',
-		minWidth: 400,
-		minHeight: 200,
+        // Basic properties of the dialog window: title, minimum size.
+        title: 'Manage Footnotes',
+        minWidth: 400,
+        minHeight: 200,
         footnotes_el: false,
 
-		// Dialog window contents definition.
-		contents: [
-			{
-				// Definition of the Basic Settings dialog tab (page).
-				id: 'tab-basic',
-				label: 'Basic Settings',
+        // Dialog window contents definition.
+        contents: [
+            {
+                // Definition of the Basic Settings dialog tab (page).
+                id: 'tab-basic',
+                label: 'Basic Settings',
 
-				// The tab contents.
-				elements: [
-					{
-						// Text input field for the footnotes text.
-						type: 'textarea',
-						id: 'new_footnote',
+                // The tab contents.
+                elements: [
+                    {
+                        // Text input field for the footnotes text.
+                        type: 'textarea',
+                        id: 'new_footnote',
                         'class': 'footnote_text',
-						label: 'New footnote:',
+                        label: 'New footnote:',
                         inputStyle: 'height: 100px',
-					},
-					{
-						// Text input field for the footnotes title (explanation).
-						type: 'text',
-						id: 'footnote_id',
-						name: 'footnote_id',
-						label: 'No existing footnotes',
+                    },
+                    {
+                        // Text input field for the footnotes title (explanation).
+                        type: 'text',
+                        id: 'footnote_id',
+                        name: 'footnote_id',
+                        label: 'No existing footnotes',
 
 
-						// Called by the main setupContent call on dialog initialization.
-						setup: function( element ) {
+                        // Called by the main setupContent call on dialog initialization.
+                        setup: function( element ) {
                             var dialog = this.getDialog();
                             $el = jQuery('#' + this.domId);
 
@@ -76,14 +76,14 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
                             } else {
                                 $el.children('div').css('display', 'none');
                             }
-						}
-					}
-				]
-			},
-		],
+                        }
+                    }
+                ]
+            },
+        ],
 
-		// Invoked when the dialog is loaded.
-		onShow: function() {
+        // Invoked when the dialog is loaded.
+        onShow: function() {
             this.setupContent();
 
             var dialog = this;
@@ -120,16 +120,18 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
                 return true;
             });
 
-		},
+        },
 
-		// This method is invoked once a user clicks the OK button, confirming the dialog.
-		onOk: function() {
+        // This method is invoked once a user clicks the OK button, confirming the dialog.
+        onOk: function() {
             var dialog = this;
 
             var footnote_editor = CKEDITOR.instances[dialog.editor_name];
-            var footnote_id     = dialog.getValueOf('tab-basic', 'footnote_id');            var footnote_data   = footnote_editor.getData();                        footnote_editor.destroy();
+            var footnote_id     = dialog.getValueOf('tab-basic', 'footnote_id');
+            var footnote_data   = footnote_editor.getData();
+            footnote_editor.destroy();
 
-            editor.fire('saveSnapshot');
+            //editor.fire('saveSnapshot');
 
             if (footnote_id == '') {
                 // No existing id selected, check for new footnote:
@@ -146,6 +148,12 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
             }
             // Destroy the editor so it's rebuilt properly next time:
             return;
-		},                onCancel: function() {            var dialog = this;            var footnote_editor = CKEDITOR.instances[dialog.editor_name];            footnote_editor.destroy();        }
-	};
+        },
+        
+        onCancel: function() {
+            var dialog = this;
+            var footnote_editor = CKEDITOR.instances[dialog.editor_name];
+            footnote_editor.destroy();
+        }
+    };
 });

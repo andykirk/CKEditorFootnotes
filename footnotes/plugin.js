@@ -10,11 +10,11 @@ CKEDITOR.plugins.add( 'footnotes', {
 
     footnote_ids: [],
     requires: 'widget',
-	icons: 'footnotes',
+    icons: 'footnotes',
 
 
-	// The plugin initialization logic goes inside this method.
-	init: function(editor) {
+    // The plugin initialization logic goes inside this method.
+    init: function(editor) {
         // Allow `cite` to be editable:
         CKEDITOR.dtd.$editable['cite'] = 1;
 
@@ -24,8 +24,13 @@ CKEDITOR.plugins.add( 'footnotes', {
         
         var $this = this;
         
-        // Force a reorder on startup to make sure all vars are set: (e.g. footnotes store)
-        editor.on('instanceReady', function(evt) {            $this.reorderMarkers(editor);
+        editor.on('saveSnapshot', function(evt) {
+            console.log('saveSnapshot');
+        });
+        
+        // Force a reorder on startup to make sure all vars are set: (e.g. footnotes store):
+        editor.on('instanceReady', function(evt) {
+            $this.reorderMarkers(editor);
         });
 
         // Add the reorder change event:
@@ -69,58 +74,58 @@ CKEDITOR.plugins.add( 'footnotes', {
         }
 
         // Register the footnotes widget.
-		editor.widgets.add('footnotes', {
+        editor.widgets.add('footnotes', {
 
-			// Minimum HTML which is required by this widget to work.
-			requiredContent: 'section(footnotes)',
+            // Minimum HTML which is required by this widget to work.
+            requiredContent: 'section(footnotes)',
 
-			// Check the elements that need to be converted to widgets.
-			upcast: function(element) {
-				return element.name == 'section' && element.hasClass('footnotes');
-			},
+            // Check the elements that need to be converted to widgets.
+            upcast: function(element) {
+                return element.name == 'section' && element.hasClass('footnotes');
+            },
 
             editables: def
-		});
+        });
 
-		// Register the footnotemarker widget.
-		editor.widgets.add('footnotemarker', {
+        // Register the footnotemarker widget.
+        editor.widgets.add('footnotemarker', {
 
-			// Minimum HTML which is required by this widget to work.
-			requiredContent: 'sup[data-footnote-id]',
+            // Minimum HTML which is required by this widget to work.
+            requiredContent: 'sup[data-footnote-id]',
 
-			// Check the elements that need to be converted to widgets.
-			upcast: function(element) {
-				return element.name == 'sup' && element.attributes['data-footnote-id'] != 'undefined';
-			},
-		});
+            // Check the elements that need to be converted to widgets.
+            upcast: function(element) {
+                return element.name == 'sup' && element.attributes['data-footnote-id'] != 'undefined';
+            },
+        });
 
-		// Define an editor command that opens our dialog.
-		editor.addCommand('footnotes', new CKEDITOR.dialogCommand('footnotesDialog', {
+        // Define an editor command that opens our dialog.
+        editor.addCommand('footnotes', new CKEDITOR.dialogCommand('footnotesDialog', {
             // @TODO: This needs work:
             allowedContent: 'section[*](*);header[*](*);li[*];a[*];cite(*)[*];sup[*]',
-			requiredContent: 'section[*](*);header[*](*);li[*];a[*];cite(*)[*];sup[*]'
-		}));
+            requiredContent: 'section[*](*);header[*](*);li[*];a[*];cite(*)[*];sup[*]'
+        }));
 
-		// Create a toolbar button that executes the above command.
-		editor.ui.addButton('Footnotes', {
+        // Create a toolbar button that executes the above command.
+        editor.ui.addButton('Footnotes', {
 
-			// The text part of the button (if available) and tooptip.
-			label: 'Insert Footnotes',
+            // The text part of the button (if available) and tooptip.
+            label: 'Insert Footnotes',
 
-			// The command to execute on click.
-			command: 'footnotes',
+            // The command to execute on click.
+            command: 'footnotes',
 
-			// The button placement in the toolbar (toolbar group name).
-			toolbar: 'insert'
-		});
+            // The button placement in the toolbar (toolbar group name).
+            toolbar: 'insert'
+        });
 
-		// Register our dialog file. this.path is the plugin folder path.
-		CKEDITOR.dialog.add('footnotesDialog', this.path + 'dialogs/footnotes.js');
-	},
+        // Register our dialog file. this.path is the plugin folder path.
+        CKEDITOR.dialog.add('footnotesDialog', this.path + 'dialogs/footnotes.js');
+    },
 
 
     build: function(footnote, is_new, editor) {
-        editor.fire('lockSnapshot');
+        
         if (is_new) {
             // Generate new id:
             footnote_id = this.generateFootnoteId();
@@ -132,13 +137,13 @@ CKEDITOR.plugins.add( 'footnotes', {
         // Insert the marker:
         var footnote_marker = '<sup data-footnote-id="' + footnote_id + '">X</sup>';
 
-        editor.fire('unlockSnapshot');
         editor.insertHtml(footnote_marker);
-
+        
         if (is_new) {
+            editor.fire('lockSnapshot');
             this.addFootnote(this.buildFootnote(footnote_id, footnote, false, editor), editor);
+            editor.fire('unlockSnapshot');
         }
-
         this.reorderMarkers(editor);
     },
 
@@ -206,7 +211,8 @@ CKEDITOR.plugins.add( 'footnotes', {
         
         // Check that there's a footnotes section. If it's been deleted the markers are useless:
         if ($contents.find('.footnotes').length == 0) {
-            $contents.find('sup[data-footnote-id]').remove();            editor.fire('unlockSnapshot');
+            $contents.find('sup[data-footnote-id]').remove();
+            editor.fire('unlockSnapshot');
             return;
         }
 
@@ -214,7 +220,8 @@ CKEDITOR.plugins.add( 'footnotes', {
         var $markers = $contents.find('sup[data-footnote-id]');
         // If there aren't any, remove the Footnotes container:
         if ($markers.length == 0) {
-        $contents.find('.footnotes').remove();            editor.fire('unlockSnapshot');
+            $contents.find('.footnotes').remove();
+            editor.fire('unlockSnapshot');
             return;
         }
 
@@ -249,7 +256,9 @@ CKEDITOR.plugins.add( 'footnotes', {
         // Then rebuild the Footnotes content to match marker order:
         var footnotes     = '';
         var footnote_text = '';
-        for (i in data.order) {
+        var i = 0
+          , l = data.order.length;
+        for (i; i < l; i++) {
             footnote_id   = data.order[i];
             footnote_text = $contents.find('.footnotes [data-footnote-id=' + footnote_id + '] cite').html();
             // If the footnotes text can't be found in the editor, it may be in the tmp store 
