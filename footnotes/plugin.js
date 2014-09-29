@@ -178,7 +178,7 @@ CKEDITOR.plugins.add( 'footnotes', {
         $footnotes = $contents.find('.footnotes');
 
         if ($footnotes.length == 0) {
-            var container = '<section class="footnotes"><header><h2>Footnotes</h2></header><ol>' + footnote + '</ol></section>&nbsp;';
+            var container = '<section class="footnotes"><header><h2>Footnotes</h2></header><ol>' + footnote + '</ol></section>';
             // Move cursor to end of content:
             var range = editor.createRange();
             range.moveToElementEditEnd(range.root);
