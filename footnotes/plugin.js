@@ -178,7 +178,7 @@ CKEDITOR.plugins.add( 'footnotes', {
         $footnotes = $contents.find('.footnotes');
 
         if ($footnotes.length == 0) {
-            var container = '<section class="footnotes"><header><h2>Footnotes</h2></header><ol>' + footnote + '</ol></section>';
+            var container = '<section class="footnotes"><header><h2>Footnotes</h2></header><ol>' + footnote + '</ol></section>&nbsp;';
             // Move cursor to end of content:
             var range = editor.createRange();
             range.moveToElementEditEnd(range.root);
@@ -220,7 +220,7 @@ CKEDITOR.plugins.add( 'footnotes', {
         var $markers = $contents.find('sup[data-footnote-id]');
         // If there aren't any, remove the Footnotes container:
         if ($markers.length == 0) {
-            $contents.find('.footnotes').remove();
+            $contents.find('.footnotes').parent().remove();
             editor.fire('unlockSnapshot');
             return;
         }
