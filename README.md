@@ -7,7 +7,7 @@ Demo: http://demo.gridlight-design.co.uk/ckeditor-footnotes.html
 
 CKEditor Addon: http://ckeditor.com/addon/footnotes
 
-Configuration
+Configuring Multiple Instances
 -------------
 
 As of 1.0.5 the plugin accepts a configuration option to allow you to prefix all your footnotes when the editor is instantiated.
