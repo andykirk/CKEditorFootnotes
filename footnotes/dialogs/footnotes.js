@@ -90,13 +90,22 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
             CKEDITOR.on( 'instanceLoaded', function( evt ) {
                 dialog.editor_name = evt.editor.name;
             } );
-
-
+            
+            var current_editor_id = dialog.getParentEditor().id;
+            
             CKEDITOR.replaceAll( function( textarea, config ) {
+                // Make sure the textarea has the correct class:
                 if (!textarea.className.match(/footnote_text/)) {
                     return false;
                 }
 
+                // Make sure we only instantiate the relevant editor:
+                var el = textarea;
+                while ((el = el.parentElement) && !el.classList.contains(current_editor_id));
+                if (!el) {
+                    return false;
+                }
+                console.log(el);
                 config.toolbarGroups = [
                     { name: 'editing',     groups: [ 'undo', 'find', 'selection', 'spellchecker' ] },
                     { name: 'clipboard',   groups: [ 'clipboard' ] },
@@ -125,13 +134,10 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
         // This method is invoked once a user clicks the OK button, confirming the dialog.
         onOk: function() {
             var dialog = this;
-
             var footnote_editor = CKEDITOR.instances[dialog.editor_name];
             var footnote_id     = dialog.getValueOf('tab-basic', 'footnote_id');
             var footnote_data   = footnote_editor.getData();
             footnote_editor.destroy();
-
-            //editor.fire('saveSnapshot');
 
             if (footnote_id == '') {
                 // No existing id selected, check for new footnote:
