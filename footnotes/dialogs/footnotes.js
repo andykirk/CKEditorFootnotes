@@ -56,7 +56,7 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
 
                             if ($footnotes.length > 0) {
                                 if ($el.find('p').length == 0) {
-                                    $el.append('<p style="margin-bottom: 10px;"><strong>OR:</strong> Choose footnote!!!:</p><ol class="footnotes_list"></ol>');
+                                    $el.append('<p style="margin-bottom: 10px;"><strong>OR:</strong> Choose footnote:</p><ol class="footnotes_list"></ol>');
                                 } else {
                                     $el.find('ol').empty();
                                 }
