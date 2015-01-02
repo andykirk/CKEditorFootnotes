@@ -3,7 +3,7 @@
  *
  * Version 1.0.9
  * https://github.com/andykirk/CKEditorFootnotes
- * 
+ *
  */
 // Register the plugin within the editor.
 CKEDITOR.plugins.add( 'footnotes', {
@@ -21,13 +21,13 @@ CKEDITOR.plugins.add( 'footnotes', {
         // Add some CSS tweaks:
         var css = '.footnotes{background:#eee; padding:1px 15px;} .footnotes cite{font-style: normal;}';
         CKEDITOR.addCss(css);
-        
+
         var $this = this;
-        
+
         editor.on('saveSnapshot', function(evt) {
             console.log('saveSnapshot');
         });
-        
+
         // Force a reorder on startup to make sure all vars are set: (e.g. footnotes store):
         editor.on('instanceReady', function(evt) {
             $this.reorderMarkers(editor);
@@ -125,7 +125,7 @@ CKEDITOR.plugins.add( 'footnotes', {
 
 
     build: function(footnote, is_new, editor) {
-        
+
         if (is_new) {
             // Generate new id:
             footnote_id = this.generateFootnoteId();
@@ -138,7 +138,7 @@ CKEDITOR.plugins.add( 'footnotes', {
         var footnote_marker = '<sup data-footnote-id="' + footnote_id + '">X</sup>';
 
         editor.insertHtml(footnote_marker);
-        
+
         if (is_new) {
             editor.fire('lockSnapshot');
             this.addFootnote(this.buildFootnote(footnote_id, footnote, false, editor), editor);
@@ -174,7 +174,7 @@ CKEDITOR.plugins.add( 'footnotes', {
     },
 
     addFootnote: function(footnote, editor) {
-        $contents  = jQuery('#' + editor.id + '_contents iframe').contents().find('body');
+        $contents  = jQuery( editor.focusManager.currentActive.$ ).contents();
         $footnotes = $contents.find('.footnotes');
 
         if ($footnotes.length == 0) {
@@ -201,14 +201,18 @@ CKEDITOR.plugins.add( 'footnotes', {
     },
 
     reorderMarkers: function(editor) {
+        // If there is no active editor there is no need to proceed
+        if ( editor.focusManager.currentActive == null ) {
+          return;
+        }
         editor.fire('lockSnapshot');
         var prefix  = editor.config.footnotesPrefix ? '-' + editor.config.footnotesPrefix : '';
-        $contents = jQuery('#' + editor.id + '_contents iframe').contents().find('body');
+        $contents = jQuery( editor.focusManager.currentActive.$ ).contents();
         var data = {
             order: [],
             occurrences: {}
         };
-        
+
         // Check that there's a footnotes section. If it's been deleted the markers are useless:
         if ($contents.find('.footnotes').length == 0) {
             $contents.find('sup[data-footnote-id]').remove();
@@ -261,7 +265,7 @@ CKEDITOR.plugins.add( 'footnotes', {
         for (i; i < l; i++) {
             footnote_id   = data.order[i];
             footnote_text = $contents.find('.footnotes [data-footnote-id=' + footnote_id + '] cite').html();
-            // If the footnotes text can't be found in the editor, it may be in the tmp store 
+            // If the footnotes text can't be found in the editor, it may be in the tmp store
             // following a cut:
             if (!footnote_text) {
                 footnote_text = editor.footnotes_tmp[footnote_id];
@@ -269,8 +273,8 @@ CKEDITOR.plugins.add( 'footnotes', {
             footnotes += this.buildFootnote(footnote_id, footnote_text, data, editor);
             // Store the footnotes for later use (post cut/paste):
             editor.footnotes_store[footnote_id] = footnote_text;
-        }       
-        
+        }
+
         // Insert the footnotes into the list:
         $contents.find('.footnotes ol').html(footnotes);
 
