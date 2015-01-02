@@ -3,7 +3,7 @@
  *
  * Version 1.0.9
  * https://github.com/andykirk/CKEditorFootnotes
- * 
+ *
  */
 
 // Dialog definition.
@@ -51,7 +51,7 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
 
                             editor = dialog.getParentEditor();
                             // Dynamically add existing footnotes:
-                            $footnotes = jQuery('#' + editor.id + '_contents iframe').contents().find('.footnotes ol');
+                            $footnotes = jQuery( editor.focusManager.currentActive.$ ).contents().find('.footnotes ol');
                             $this = this;
 
                             if ($footnotes.length > 0) {
@@ -60,7 +60,7 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
                                 } else {
                                     $el.find('ol').empty();
                                 }
-                                
+
                                 var radios = '';
                                 $footnotes.find('li').each(function(){
                                     $item = jQuery(this);
@@ -91,9 +91,9 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
             CKEDITOR.on( 'instanceLoaded', function( evt ) {
                 dialog.editor_name = evt.editor.name;
             } );
-            
+
             var current_editor_id = dialog.getParentEditor().id;
-            
+
             CKEDITOR.replaceAll( function( textarea, config ) {
                 // Make sure the textarea has the correct class:
                 if (!textarea.className.match(/footnote_text/)) {
@@ -156,7 +156,7 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
             // Destroy the editor so it's rebuilt properly next time:
             return;
         },
-        
+
         onCancel: function() {
             var dialog = this;
             var footnote_editor = CKEDITOR.instances[dialog.editor_name];
