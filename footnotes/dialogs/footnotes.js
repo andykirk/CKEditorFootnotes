@@ -55,7 +55,7 @@
 
                                 editor = dialog.getParentEditor();
                                 // Dynamically add existing footnotes:
-                                $footnotes = $('#' + editor.id + '_contents iframe').contents().find('.footnotes ol');
+                                $footnotes = $(editor.editable().$).find('.footnotes ol');
                                 $this = this;
 
                                 if ($footnotes.length > 0) {

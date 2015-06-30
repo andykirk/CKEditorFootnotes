@@ -187,8 +187,8 @@
         },
 
         addFootnote: function(footnote, editor) {
-            var $contents  = $(editor.editable().$),
-                $footnotes = $contents.find('.footnotes');
+            var $contents  = $(editor.editable().$);
+            var $footnotes = $contents.find('.footnotes');
 
             if ($footnotes.length == 0) {
                 var container = '<section class="footnotes"><header><h2>Footnotes</h2></header><ol>' + footnote + '</ol></section>';
