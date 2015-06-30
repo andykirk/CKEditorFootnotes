@@ -6,8 +6,11 @@
  *
  */
 // Register the plugin within the editor.
-(function() {
+(function($) {
     "use strict";
+
+
+
     CKEDITOR.plugins.add( 'footnotes', {
 
         footnote_ids: [],
@@ -17,6 +20,14 @@
 
         // The plugin initialization logic goes inside this method.
         init: function(editor) {
+
+            // Check for jQuery
+            // @TODO - remove if/when JQ dep. is removed.
+            if (typeof(window.jQuery) == 'undefined') {
+                console.warn('jQuery required but undetected so quitting footnotes.');
+                return false;
+            }
+
             // Allow `cite` to be editable:
             CKEDITOR.dtd.$editable['cite'] = 1;
 

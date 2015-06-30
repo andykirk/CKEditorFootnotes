@@ -8,6 +8,7 @@
 
 (function($) {
     "use strict";
+
     // Dialog definition.
     CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
 
