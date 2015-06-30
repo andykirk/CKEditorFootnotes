@@ -1,4 +1,4 @@
-﻿/**
+﻿﻿/**
  * The footnotes dialog definition.
  *
  * Version 1.0.9
@@ -91,6 +91,10 @@ CKEDITOR.dialog.add( 'footnotesDialog', function( editor ) {
             CKEDITOR.on( 'instanceLoaded', function( evt ) {
                 dialog.editor_name = evt.editor.name;
             } );
+            
+            // Allow page to scroll with dialog to allow for many/long footnotes
+            // (https://github.com/andykirk/CKEditorFootnotes/issues/12)
+            jQuery('.cke_dialog').css({'position': 'absolute', 'top': '2%'});
             
             var current_editor_id = dialog.getParentEditor().id;
             
