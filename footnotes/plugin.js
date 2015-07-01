@@ -191,7 +191,12 @@
             var $footnotes = $contents.find('.footnotes');
 
             if ($footnotes.length == 0) {
-                var container = '<section class="footnotes"><header><h2>Footnotes</h2></header><ol>' + footnote + '</ol></section>';
+                var header_title = editor.config.footnotesTitle ? editor.config.footnotesTitle : 'Footnotes';
+                var header_els = ['<h2>', '</h2>'];//editor.config.footnotesPrefix
+                if (editor.config.footnotesTitle) {
+                    header_els = editor.config.footnotesHeaderEls;
+                }
+                var container = '<section class="footnotes"><header>' + header_els[0] + header_title + header_els[1] + '</header><ol>' + footnote + '</ol></section>';
                 // Move cursor to end of content:
                 var range = editor.createRange();
                 range.moveToElementEditEnd(range.root);
