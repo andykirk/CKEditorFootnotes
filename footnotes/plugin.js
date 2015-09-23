@@ -182,7 +182,7 @@
                     }
                 }
             }
-            footnote = '<li id="footnote' + prefix + '-' + order + '" data-footnote-id="' + footnote_id + '">' + links + '<cite>' + footnote_text + '</cite></li>';
+            footnote = '<li id="footnote' + prefix + '-' + order + '" data-footnote-id="' + footnote_id + '"><sup>' + links + '</sup><cite>' + footnote_text + '</cite></li>';
             return footnote;
         },
 
