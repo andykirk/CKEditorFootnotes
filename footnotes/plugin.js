@@ -192,8 +192,8 @@
 
             if ($footnotes.length == 0) {
                 var header_title = editor.config.footnotesTitle ? editor.config.footnotesTitle : 'Footnotes';
-                var header_els = ['<h2>', '</h2>'];//editor.config.footnotesPrefix
-                if (editor.config.footnotesTitle) {
+                var header_els = ['<h2>', '</h2>'];//editor.config.editor.config.footnotesHeaderEls
+                if (editor.config.footnotesHeaderEls) {
                     header_els = editor.config.footnotesHeaderEls;
                 }
                 var container = '<section class="footnotes"><header>' + header_els[0] + header_title + header_els[1] + '</header><ol>' + footnote + '</ol></section>';
