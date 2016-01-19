@@ -108,7 +108,7 @@
 
                 // Check the elements that need to be converted to widgets.
                 upcast: function(element) {
-                    return element.name == 'sup' && element.attributes['data-footnote-id'] != 'undefined';
+                    return element.name == 'sup' && typeof(element.attributes['data-footnote-id']) != 'undefined';
                 },
             });
 
