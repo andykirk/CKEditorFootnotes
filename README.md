@@ -38,3 +38,9 @@ CKEDITOR.replace( 'editor1', {
     footnotesTitle: 'References' // Defaults to 'Footnotes'
 } );
 ~~~
+
+Paste From Word
+---------------
+
+An complimentary plugin that allows automatic conversion from content pasted from word is now available:
+[CKEditorFootnotes-PasteFromWord](https://github.com/andykirk/CKEditorFootnotes-PasteFromWord)
