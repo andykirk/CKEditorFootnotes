@@ -42,5 +42,5 @@ CKEDITOR.replace( 'editor1', {
 Paste From Word
 ---------------
 
-An complimentary plugin that allows automatic conversion from content pasted from word is now available:
+A complimentary plugin that allows automatic conversion from content pasted from word is now available:
 [CKEditorFootnotes-PasteFromWord](https://github.com/andykirk/CKEditorFootnotes-PasteFromWord)
