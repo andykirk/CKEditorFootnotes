@@ -96,10 +96,6 @@
                     dialog.editor_name = evt.editor.name;
                 } );
 
-                // Allow page to scroll with dialog to allow for many/long footnotes
-                // (https://github.com/andykirk/CKEditorFootnotes/issues/12)
-                jQuery('.cke_dialog').css({'position': 'absolute', 'top': '2%'});
-
                 var current_editor_id = dialog.getParentEditor().id;
 
                 CKEDITOR.replaceAll( function( textarea, config ) {
@@ -129,6 +125,11 @@
                     config.removePlugins = 'footnotes';
 
                     config.on = {
+                        // Re-layout dialog after textarea is loaded to fix scroll behaviour
+                        // (https://github.com/andykirk/CKEditorFootnotes/issues/12)
+                        instanceReady: function() {
+                            dialog.layout();
+                        },
                         focus: function( evt ){
                             var $editor_el = $('#' + evt.editor.id + '_contents');
                             $editor_el.parents('tr').next().find(':checked').attr('checked', false);
