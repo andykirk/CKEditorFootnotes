@@ -16,6 +16,7 @@
         footnote_ids: [],
         requires: 'widget',
         icons: 'footnotes',
+        lang: 'en,de',
 
 
         // The plugin initialization logic goes inside this method.
@@ -123,7 +124,7 @@
             editor.ui.addButton('Footnotes', {
 
                 // The text part of the button (if available) and tooptip.
-                label: 'Insert Footnotes',
+                label: editor.lang.footnotes.buttons.add,
 
                 // The command to execute on click.
                 command: 'footnotes',

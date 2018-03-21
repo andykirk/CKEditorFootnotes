@@ -15,7 +15,7 @@
         return {
             editor_name: false,
             // Basic properties of the dialog window: title, minimum size.
-            title: 'Manage Footnotes',
+            title:  editor.lang.footnotes.dialog.title,
             minWidth: 400,
             minHeight: 200,
             footnotes_el: false,
@@ -25,7 +25,7 @@
                 {
                     // Definition of the Basic Settings dialog tab (page).
                     id: 'tab-basic',
-                    label: 'Basic Settings',
+                    label: editor.lang.footnotes.dialog.basicSettings,
 
                     // The tab contents.
                     elements: [
@@ -34,7 +34,7 @@
                             type: 'textarea',
                             id: 'new_footnote',
                             'class': 'footnote_text',
-                            label: 'New footnote:',
+                            label: editor.lang.footnotes.dialog.fields.text,
                             inputStyle: 'height: 100px',
                         },
                         {
@@ -42,7 +42,7 @@
                             type: 'text',
                             id: 'footnote_id',
                             name: 'footnote_id',
-                            label: 'No existing footnotes',
+                            label: editor.lang.footnotes.dialog.fields.id,
 
 
                             // Called by the main setupContent call on dialog initialization.
@@ -60,7 +60,7 @@
 
                                 if ($footnotes.length > 0) {
                                     if ($el.find('p').length == 0) {
-                                        $el.append('<p style="margin-bottom: 10px;"><strong>OR:</strong> Choose footnote:</p><ol class="footnotes_list"></ol>');
+                                        $el.append('<p style="margin-bottom: 10px;"><strong>' + editor.lang.footnotes.dialog.texts.or + '</strong> ' + editor.lang.footnotes.dialog.texts.choose + '</p><ol class="footnotes_list"></ol>');
                                     } else {
                                         $el.find('ol').empty();
                                     }
