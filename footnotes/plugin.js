@@ -6,10 +6,8 @@
  *
  */
 // Register the plugin within the editor.
-(function($) {
+(function() {
     "use strict";
-
-
 
     CKEDITOR.plugins.add( 'footnotes', {
 
@@ -20,13 +18,6 @@
 
         // The plugin initialization logic goes inside this method.
         init: function(editor) {
-
-            // Check for jQuery
-            // @TODO - remove if/when JQ dep. is removed.
-            if (typeof(window.jQuery) == 'undefined') {
-                console.warn('jQuery required but undetected so quitting footnotes.');
-                return false;
-            }
 
             // Allow `cite` to be editable:
             CKEDITOR.dtd.$editable['cite'] = 1;
@@ -79,9 +70,15 @@
                     allowedContent: 'strong em span sub sup;'
                 }
             };
-            var contents = $('<div>' + editor.element.$.textContent + '</div>')
-                     , l = contents.find('.footnotes li').length
-                     , i = 1;
+
+            // Get the number of existing footnotes. Note that the editor document isn't populated
+            // yet so we need to use vanilla JS:
+            var div = document.createElement('div');
+            div.innerHTML = editor.element.$.textContent.trim();
+
+            var l = div.querySelectorAll('.footnotes li').length,
+                i = 1;
+
             for (i; i <= l; i++) {
                 def['footnote_' + i] = {selector: '#footnote' + prefix + '-' + i + ' cite', allowedContent: 'a[href]; cite[*](*); strong em span br'};
             }
@@ -187,10 +184,10 @@
         },
 
         addFootnote: function(footnote, editor) {
-            var $contents  = $(editor.editable().$);
-            var $footnotes = $contents.find('.footnotes');
+            var contents = editor.editable();
+            var footnotes = contents.findOne('.footnotes');
 
-            if ($footnotes.length == 0) {
+            if (footnotes === null) {
                 var header_title = editor.config.footnotesTitle ? editor.config.footnotesTitle : 'Footnotes';
                 var header_els = ['<h2>', '</h2>'];//editor.config.editor.config.footnotesHeaderEls
                 if (editor.config.footnotesHeaderEls) {
@@ -204,7 +201,7 @@
                 // Insert the container:
                 editor.insertHtml(container);
             } else {
-                $footnotes.find('ol').append(footnote);
+                footnotes.findOne('ol').appendHtml(footnote);
             }
         },
 
@@ -220,31 +217,36 @@
         reorderMarkers: function(editor) {
             editor.fire('lockSnapshot');
             var prefix  = editor.config.footnotesPrefix ? '-' + editor.config.footnotesPrefix : '';
-            var $contents = $(editor.editable().$);
+
+            var contents = editor.editable();
             var data = {
                 order: [],
                 occurrences: {}
             };
 
             // Check that there's a footnotes section. If it's been deleted the markers are useless:
-            if ($contents.find('.footnotes').length == 0) {
-                $contents.find('sup[data-footnote-id]').remove();
+            if (contents.find('.footnotes').toArray().length == 0) {
+                contents.find('sup[data-footnote-id]').toArray().forEach(function(item){
+                    item.remove();
+                });
                 editor.fire('unlockSnapshot');
                 return;
             }
 
             // Find all the markers in the document:
-            var $markers = $contents.find('sup[data-footnote-id]');
+            var markers = contents.find('sup[data-footnote-id]').toArray();
+            
             // If there aren't any, remove the Footnotes container:
-            if ($markers.length == 0) {
-                $contents.find('.footnotes').parent().remove();
+            if (markers.length == 0) {
+                contents.findOne('.footnotes').getParent().remove();
                 editor.fire('unlockSnapshot');
                 return;
             }
 
             // Otherwise reorder the markers:
-            $markers.each(function(){
-                var footnote_id = $(this).attr('data-footnote-id')
+            markers.forEach(function(item){
+
+                var footnote_id = item.getAttribute('data-footnote-id')
                   , marker_ref
                   , n = data.order.indexOf(footnote_id);
 
@@ -264,7 +266,9 @@
                 }
                 // Replace the marker contents:
                 var marker = '<a href="#footnote' + prefix + '-' + n + '" id="footnote-marker' + prefix + '-' + marker_ref + '" rel="footnote">[' + n + ']</a>';
-                $(this).html(marker);
+
+                item.setHtml(marker);
+
             });
 
             // Prepare the footnotes_store object:
@@ -278,7 +282,7 @@
               , l = data.order.length;
             for (i; i < l; i++) {
                 footnote_id   = data.order[i];
-                footnote_text = $contents.find('.footnotes [data-footnote-id=' + footnote_id + '] cite').html();
+                footnote_text = contents.findOne('.footnotes [data-footnote-id="' + footnote_id + '"] cite').getHtml();
                 // If the footnotes text can't be found in the editor, it may be in the tmp store
                 // following a cut:
                 if (!footnote_text) {
@@ -290,11 +294,11 @@
             }
 
             // Insert the footnotes into the list:
-            $contents.find('.footnotes ol').html(footnotes);
+            contents.findOne('.footnotes ol').setHtml(footnotes);
 
             // Next we need to reinstate the 'editable' properties of the footnotes.
             // (we have to do this individually due to Widgets 'fireOnce' for editable selectors)
-            var el = $contents.find('.footnotes')
+            var el = contents.findOne('.footnotes')
               , n
               , footnote_widget;
             // So first we need to find the right Widget instance:
@@ -314,4 +318,4 @@
             editor.fire('unlockSnapshot');
         }
     });
-}(window.jQuery));
+}());
