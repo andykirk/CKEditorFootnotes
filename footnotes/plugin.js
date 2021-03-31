@@ -207,7 +207,7 @@
 
         generateFootnoteId: function() {
             var id = Math.random().toString(36).substr(2, 5);
-            while ($.inArray(id, this.footnote_ids) != -1) {
+            while (String.prototype.indexOf(id, this.footnote_ids) != -1) {
                 id = String(this.generateFootnoteId());
             }
             this.footnote_ids.push(id);
