@@ -150,6 +150,13 @@
                     config.autoGrow_minHeight = 80;
                     config.removePlugins = 'footnotes';
 
+                    var extra_config = editor.config.footnotesDialogEditorExtraConfig;
+                    if (extra_config) {
+                        for (var attribute in extra_config) {
+                            config[attribute] = extra_config[attribute];
+                        }
+                    }
+
                     // If we focus on the dialog editor we should clear the radios to avoid any
                     // confusion. Similarly, if we focus on a radio, we should clear the editor
                     // (see setup above for radio change event handler for that)
