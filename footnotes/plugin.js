@@ -249,9 +249,9 @@
             }
 
             // If a header was previously added but is now disabled, remove it
-            var header_elements = contents.find('.footnotes > header');
-            if (editor.config.footnotesDisableHeader && header_elements.toArray().length) {
-                header_elements.remove();
+            var header_element = contents.findOne('.footnotes > header');
+            if (editor.config.footnotesDisableHeader && header_element) {
+                header_element.remove();
             }
 
             // Find all the markers in the document:
