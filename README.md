@@ -34,6 +34,7 @@ E.g.
 
 ~~~
 CKEDITOR.replace( 'editor1', {
+    footnotesDisableHeader: true, // Defaults to false
     footnotesHeaderEls: ['<p><b>', '</b></p>'], // Defaults to ['<h2>', '</h2>']
     footnotesTitle: 'References' // Defaults to 'Footnotes'
 } );
