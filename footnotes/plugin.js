@@ -80,7 +80,7 @@
                 i = 1;
 
             for (i; i <= l; i++) {
-                def['footnote_' + i] = {selector: '#footnote' + prefix + '-' + i + ' cite', allowedContent: 'a[href]; cite[*](*); strong em span br'};
+                def['footnote_' + i] = {selector: '#footnote' + prefix + '-' + i + ' cite', allowedContent: 'a[*]; cite[*](*); strong em span br'};
             }
 
             // Register the footnotes widget.
@@ -312,7 +312,7 @@
             // Then we `initEditable` each footnote, giving it a unique selector:
             for (i in data.order) {
                 n = parseInt(i) + 1;
-                footnote_widget.initEditable('footnote_' + n, {selector: '#footnote' + prefix + '-' + n +' cite', allowedContent: 'a[href]; cite[*](*); em strong span'});
+                footnote_widget.initEditable('footnote_' + n, {selector: '#footnote' + prefix + '-' + n +' cite', allowedContent: 'a[*]; cite[*](*); em strong span'});
             }
 
             editor.fire('unlockSnapshot');
