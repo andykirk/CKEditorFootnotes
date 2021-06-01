@@ -63,13 +63,15 @@
 
             // Build the initial footnotes widget editables definition:
             var prefix = editor.config.footnotesPrefix ? '-' + editor.config.footnotesPrefix : '';
-            var def = {
-                header: {
+            var def = {};
+
+            if (!editor.config.footnotesDisableHeader) {
+                def.header = {
                     selector: 'header > *',
                     //allowedContent: ''
                     allowedContent: 'strong em span sub sup;'
-                }
-            };
+                };
+            }
 
             // Get the number of existing footnotes. Note that the editor document isn't populated
             // yet so we need to use vanilla JS:
@@ -188,16 +190,29 @@
             var footnotes = contents.findOne('.footnotes');
 
             if (footnotes === null) {
-                var header_title = editor.config.footnotesTitle ? editor.config.footnotesTitle : 'Footnotes';
-                var header_els = ['<h2>', '</h2>'];//editor.config.editor.config.footnotesHeaderEls
-                if (editor.config.footnotesHeaderEls) {
-                    header_els = editor.config.footnotesHeaderEls;
+                var container = '<section class="footnotes">';
+
+                // Add header
+                if (!editor.config.footnotesDisableHeader) {
+                    var header_title = editor.config.footnotesTitle ? editor.config.footnotesTitle : 'Footnotes';
+                    var header_els = ['<h2>', '</h2>'];//editor.config.editor.config.footnotesHeaderEls
+                    if (editor.config.footnotesHeaderEls) {
+                        header_els = editor.config.footnotesHeaderEls;
+                    }
+                    container += '<header>' + header_els[0] + header_title + header_els[1] + '</header>';
                 }
-                var container = '<section class="footnotes"><header>' + header_els[0] + header_title + header_els[1] + '</header><ol>' + footnote + '</ol></section>';
+
+                // Add footnote
+                container += '<ol>' + footnote + '</ol>';
+
+                // End section
+                container += '</section>';
+
                 // Move cursor to end of content:
                 var range = editor.createRange();
                 range.moveToElementEditEnd(range.root);
                 editor.getSelection().selectRanges([range]);
+
                 // Insert the container:
                 editor.insertHtml(container);
             } else {
@@ -231,6 +246,12 @@
                 });
                 editor.fire('unlockSnapshot');
                 return;
+            }
+
+            // If a header was previously added but is now disabled, remove it
+            var header_element = contents.findOne('.footnotes > header');
+            if (editor.config.footnotesDisableHeader && header_element) {
+                header_element.remove();
             }
 
             // Find all the markers in the document:
