@@ -5,6 +5,7 @@ Maintainers Required
 --------------------
 
 Unfortunately I don't have the time to give this project the attention it deserves. I'm happy to hand this over to someone or add contributors to help keep this ticking over.
+If you're interested, please get in touch.
 
 ---
 
