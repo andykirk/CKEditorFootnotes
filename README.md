@@ -43,7 +43,8 @@ E.g.
 ~~~
 CKEDITOR.replace( 'editor1', {
     footnotesHeaderEls: ['<p><b>', '</b></p>'], // Defaults to ['<h2>', '</h2>']
-    footnotesTitle: 'References' // Defaults to 'Footnotes'
+    footnotesTitle: 'References', // Defaults to 'Footnotes'
+    footnotesDialogEditorExtraConfig: { height: 150 } // Will be merged with the default options for the footnote editor
 } );
 ~~~
 
