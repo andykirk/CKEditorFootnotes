@@ -115,7 +115,7 @@
             editor.addCommand('footnotes', new CKEDITOR.dialogCommand('footnotesDialog', {
                 // @TODO: This needs work:
                 allowedContent: 'section[*](*);header[*](*);li[*];a[*];cite(*)[*];sup[*]',
-                requiredContent: 'section[*](*);header[*](*);li[*];a[*];cite(*)[*];sup[*]'
+                requiredContent: 'section(footnotes);header;li[id,data-footnote-id];a[href,id,rel];cite;sup[data-footnote-id]'
             }));
 
             // Create a toolbar button that executes the above command.
